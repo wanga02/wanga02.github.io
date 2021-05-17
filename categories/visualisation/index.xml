@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>visualisation on aileen wang</title>
+    <link>https://wanga02.github.io/categories/visualisation/</link>
+    <description>Recent content in visualisation on aileen wang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Aileen Wang</copyright>
+    <lastBuildDate>Sun, 10 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://wanga02.github.io/categories/visualisation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Analogue data visualisation (ft. Dear Data)</title>
+      <link>https://wanga02.github.io/posts/analogue-data-visualisation/</link>
+      <pubDate>Sun, 10 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/posts/analogue-data-visualisation/</guid>
+      <description>In 2016 I went to the Big Bang Data exhibit at Somerset House and fell hard and fast for Giorgia Lupi and Stefanie Posavec&amp;rsquo;s art project. My good friend Maria (of Studio HOTmess) and I decided to take on the challenge. The idea is to record and visualise data around one aspect of your life each week, and then send it to your partner in crime in the post.
+We reprised the habit for a couple of months during the first 2020 lockdown.</description>
+    </item>
+    
+  </channel>
+</rss>

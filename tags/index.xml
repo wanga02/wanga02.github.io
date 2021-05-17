@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on aileen wang</title>
+    <link>https://wanga02.github.io/tags/</link>
+    <description>Recent content in Tags on aileen wang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Aileen Wang</copyright>
+    <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://wanga02.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>classifier</title>
+      <link>https://wanga02.github.io/tags/classifier/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/tags/classifier/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>machine learning</title>
+      <link>https://wanga02.github.io/tags/machine-learning/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>modelling</title>
+      <link>https://wanga02.github.io/tags/modelling/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/tags/modelling/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>art</title>
+      <link>https://wanga02.github.io/tags/art/</link>
+      <pubDate>Sun, 10 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/tags/art/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

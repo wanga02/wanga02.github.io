@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Building a colour classifier for Magic: The Gathering cards - Part 1: Data Exploration and Feature Engineering | aileen wang</title>
+  <meta name="description" content="I&#39;m a principal data analyst working at the BBC, analysing podcast and music listening for BBC Sounds. I&#39;ve built a data career from an arts background, and enjoy playing around where those areas intersect. R and Python. Interested in data visualisation (like every other analyst with a website) both digital and analogue, text analysis, machine learning, digital media and pop culture. Always happy to collaborate - reach out!">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Building a colour classifier for Magic: The Gathering cards - Part 1: Data Exploration and Feature Engineering" />
+<meta property="og:description" content="Three lockdowns and a year of quarantine later, I&rsquo;ve found myself with a few more hobbies and interests. Not quite a daily Yoga with Adriene habit (though I did manage about half a month before falling off that wagon) - but I have been playing a lot of Magic: The Gathering with friends.
+To those unacquainted, MTG was released in 1993 and is the world&rsquo;s first trading card game - these days it also exists as an impressive and pandemic-friendly online interface." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/" />
+<meta property="article:published_time" content="2021-03-20T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-03-20T00:00:00+00:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Building a colour classifier for Magic: The Gathering cards - Part 1: Data Exploration and Feature Engineering"/>
+<meta name="twitter:description" content="Three lockdowns and a year of quarantine later, I&rsquo;ve found myself with a few more hobbies and interests. Not quite a daily Yoga with Adriene habit (though I did manage about half a month before falling off that wagon) - but I have been playing a lot of Magic: The Gathering with friends.
+To those unacquainted, MTG was released in 1993 and is the world&rsquo;s first trading card game - these days it also exists as an impressive and pandemic-friendly online interface."/>
+
+  
+  
+    
+  
+  
+  <link rel="stylesheet" href="https://wanga02.github.io/css/style-light.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://wanga02.github.io/images/favicon.ico" />
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">Projects</a></li>
+         
+        <li><a href="/tags">Tags</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://wanga02.github.io/posts/analogue-data-visualisation/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&text=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&is_video=false&description=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering&body=Check out this article: https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&name=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering&description=Three%20lockdowns%20and%20a%20year%20of%20quarantine%20later%2c%20I%26rsquo%3bve%20found%20myself%20with%20a%20few%20more%20hobbies%20and%20interests.%20Not%20quite%20a%20daily%20Yoga%20with%20Adriene%20habit%20%28though%20I%20did%20manage%20about%20half%20a%20month%20before%20falling%20off%20that%20wagon%29%20-%20but%20I%20have%20been%20playing%20a%20lot%20of%20Magic%3a%20The%20Gathering%20with%20friends.%0aTo%20those%20unacquainted%2c%20MTG%20was%20released%20in%201993%20and%20is%20the%20world%26rsquo%3bs%20first%20trading%20card%20game%20-%20these%20days%20it%20also%20exists%20as%20an%20impressive%20and%20pandemic-friendly%20online%20interface.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&t=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#loading-the-data-and-initial-preprocessing">Loading the data and initial preprocessing</a></li>
+        <li><a href="#feature-engineering---generating-new-features">Feature engineering - generating new features</a></li>
+        <li><a href="#data-visualisation-and-exploration">Data visualisation and exploration</a>
+          <ul>
+            <li></li>
+            <li><a href="#creatures-with-variable-power-and-toughness-or-the-ability-to-modify-the-power-and-toughness-of-other-creatures">Creatures with variable power and toughness, or the ability to modify the power and toughness of other creatures</a></li>
+            <li><a href="#colours-vs-keyword-abilities-and-actions">Colours vs. keyword abilities and actions</a></li>
+          </ul>
+        </li>
+        <li><a href="#stay-tuned-for-part-2">Stay tuned for part 2!</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Building a colour classifier for Magic: The Gathering cards - Part 1: Data Exploration and Feature Engineering
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2021-03-20 00:00:00 &#43;0000 UTC" itemprop="datePublished">2021-03-20</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/feature-engineering">feature engineering</a>
+            
+            
+            <a class="category-link" href="/categories/preprocessing">preprocessing</a>
+            
+             ,  
+            <a class="category-link" href="/categories/mtg">mtg</a>
+            
+             ,  
+            <a class="category-link" href="/categories/magic-the-gathering">magic the gathering</a>
+            
+             ,  
+            <a class="category-link" href="/categories/classifier">classifier</a>
+            
+             ,  
+            <a class="category-link" href="/categories/modelling">modelling</a>
+            
+             ,  
+            <a class="category-link" href="/categories/machine-learning">machine learning</a>
+            
+        </div>
+        
+        
+        <div class="article-tag">
+            <i class="fas fa-tag"></i>
+            
+            
+            <a class="tag-link" href="/tags/classifier" rel="tag">classifier</a>
+            
+            
+            <a class="tag-link" href="/tags/machine-learning" rel="tag">machine learning</a>
+            
+             ,  
+            <a class="tag-link" href="/tags/modelling" rel="tag">modelling</a>
+            
+        </div>
+        
+      </div>
+    </header>
+
+
+    <div class="content" itemprop="articleBody">
+      <p>Three lockdowns and a year of quarantine later, I&rsquo;ve found myself with a few more hobbies and interests. Not quite a daily Yoga with Adriene habit (though I did manage about half a month before falling off that wagon) - but I <em>have</em> been playing a lot of Magic: The Gathering with friends.</p>
+<p><img src="/mtg_cards.png" alt="mtg_cards.png"></p>
+<p>To those unacquainted, MTG was released in 1993 and is the world&rsquo;s first trading card game - these days it also exists as an impressive and pandemic-friendly online interface. In practice, imagine a combination of Pokemon and chess, set in the realm of fantasy.</p>
+<p>In its decades-long lifetime over 20,000 unique cards have been released. They come in 5 colours, each with archetypal features and playing styles.</p>
+<p>To summarise the colour identities from the MTG wiki:</p>
+<ul>
+<li><strong><!-- raw HTML omitted -->White<!-- raw HTML omitted --></strong> represents order, peace and light. Cards tend to focus on healing, protection and neutralising opponent advantages.</li>
+<li><strong><!-- raw HTML omitted -->Blue<!-- raw HTML omitted --></strong> represents control and trickery, and is when MTG is at its most chess-like. Cards tend to be evasive and can interfere with opponent cards (e.g. taking temporary control over an opponent creature or counter effects). Blue cards often disrupt the general flow of the game, making use of &lsquo;instants&rsquo; which can be played at any time.</li>
+<li><strong>Black</strong> represents death, sacrifice and necromancy. The power of cards often depend on sacrificing other cards or life points. Many simply destroy opponent cards, and bringing your own cards back from the graveyard is a common mechanic.</li>
+<li><strong><!-- raw HTML omitted -->Red<!-- raw HTML omitted --></strong> represents warfare and aggression. Cards are offense-oriented and can often be &lsquo;powered-up&rsquo; with supplementary boosting. Red is about playing hard and fast to gain short-term advantages.</li>
+<li><strong><!-- raw HTML omitted -->Green<!-- raw HTML omitted --></strong> represents nature, evolution and indulgence. It includes cards with very high power and defense levels (<em>big stompy bois</em> as we call them), and can dominate the field with many creatures at play at once. Cards often generate life points, or &lsquo;mana&rsquo; that allows you to play more cards.</li>
+</ul>
+<p>Colours are an integral part of the game and crucial to its design, so much so that wannabe-MTG-designers are <a href="https://magic.wizards.com/en/articles/archive/making-magic/make-choice-part-1-2018-02-12">tested on their understanding of the colour philosophies</a>; &lsquo;What is the most appropriate color for this card?&rsquo;, &lsquo;Which of these phrases is a follower of Black&rsquo;s philosophy least likely to say?&rsquo;, &lsquo;Which of these keyword abilities is most likely to be on a common white creature?&rsquo;</p>
+<p>The colours may seem distinctive, but the game has had a long time to evolve, becoming more creative and complex in the way that colour is used. In this series I attempt to build a colour classifier for MTG cards based on their features alone, using machine learning methods. We will see how distinct the colours are from each other, which colours behave most similarly, and what the most defining features and game mechanics are for each colour. How &lsquo;true&rsquo; to their designated colours are MTG cards really? Has the colour philosophy become too nuanced at this point for a model to understand it?</p>
+<p>MTG card data has been made available by a community of fans and developers at <a href="https://magicthegathering.io/#about">magicthegathering.io</a> and the open source <a href="https://mtgjson.com/">MTGJSON</a> project.</p>
+<p>This post covers the first steps of any machine learning problem - data preprocessing, exploration and feature engineering. To skip to the most interesting part - the initial analysis - <a href="https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/#data-visualisation-and-exploration">click here</a>!</p>
+<h3 id="loading-the-data-and-initial-preprocessing">Loading the data and initial preprocessing</h3>
+<p>First we load the data in using the <a href="https://github.com/MagicTheGathering/mtg-sdk-python">MTG Python SDK</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#75715e">#import python modules for data manipulation and visualisation</span>
+<span style="color:#f92672">import</span> pandas <span style="color:#f92672">as</span> pd
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">import</span> matplotlib <span style="color:#f92672">as</span> plt
+<span style="color:#f92672">import</span> seaborn <span style="color:#f92672">as</span> sns
+
+<span style="color:#75715e">#import the mtgsdk modules</span>
+<span style="color:#f92672">from</span> mtgsdk <span style="color:#f92672">import</span> Card
+<span style="color:#f92672">from</span> mtgsdk <span style="color:#f92672">import</span> Set
+<span style="color:#f92672">from</span> mtgsdk <span style="color:#f92672">import</span> Type
+<span style="color:#f92672">from</span> mtgsdk <span style="color:#f92672">import</span> Supertype
+<span style="color:#f92672">from</span> mtgsdk <span style="color:#f92672">import</span> Subtype
+<span style="color:#f92672">from</span> mtgsdk <span style="color:#f92672">import</span> Changelog
+
+<span style="color:#75715e">#get a list of 55953 English cards (returned as Card objects)</span>
+<span style="color:#75715e">#this took about 15mins to run</span>
+all_cards <span style="color:#f92672">=</span> Card<span style="color:#f92672">.</span>where(language<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;English&#34;</span>)<span style="color:#f92672">.</span>all()
+</code></pre></div><p>Through some basic reformatting, we can turn this list into a dataframe called <code>cards_df</code> containing the following features:</p>
+<p><img src="/cards_df_info.png" alt="cards_df_info.png"></p>
+<p>And here&rsquo;s a sample of rows and columns.</p>
+<p><img src="/cards_df_head.png" alt="cards_df_head.png"></p>
+<p>A quick look at the colours first - that&rsquo;s what we&rsquo;re interested in!</p>
+<p><img src="/cards_df_colors_value_counts.png" alt="cards_df_colors_value_counts.png"></p>
+<p>The complexity of the colour system is immediately evident here - there&rsquo;s over 12k colourless cards (22%), and 5k multi-coloured cards (9%).</p>
+<p>Before exploring the data further, the <code>info</code> method makes it clear pre-processing is needed (numeric fields like power and toughness are in here as strings). I did some extensive data cleaning that included the following key manipulations:</p>
+<ul>
+<li>Deduplicating cards (varying printings of the same card were included in the original dataset)</li>
+<li>Convert <code>power</code>, <code>toughness</code> and <code>loyalty</code> fields to <code>int</code> values, which involved imputing numerical values to replace string values like  &lsquo;*&rsquo; or &lsquo;1+*&rsquo; (used when power/toughness/loyalty is dependent on other external gameplay elements)</li>
+<li>Reconcile the <code>colors</code> and <code>color_identity</code> fields to create a consolidated representation of a card&rsquo;s colour, stored as <code>consolidated_color</code></li>
+<li>Filter to single-color cards for the sake of simplicity. This excludes multi-color cards and colourless cards (e.g. <a href="https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=73967&amp;type=card">this &lsquo;Legendary Land&rsquo; card</a> which has a &lsquo;PLAY AT YOUR OWN RISK&rsquo; sticker on it?!).</li>
+<li>Filtering out the &lsquo;un&rsquo; sets - a series of joke sets that MTG&rsquo;s creators have released which are very un-representative of standard cards. These are worth looking at for their own merit - here&rsquo;s a few of my favourites.</li>
+</ul>
+<p><img src="/unsets.png" alt="unsets.png"></p>
+<ul>
+<li>To train the model I&rsquo;ll only use creature cards for now - this is because some features only apply to specific card types. Creatures are the most common card type in MTG, and are the only ones with <code>power</code> and <code>toughness</code> values.</li>
+</ul>
+<p><img src="/card_type_value_counts.png" alt="card_type_value_counts.png"></p>
+<p>After all this cleaning we&rsquo;re left with 9242 cards.</p>
+<h3 id="feature-engineering---generating-new-features">Feature engineering - generating new features</h3>
+<p>After cleaning, I created some new features to capture extra information that could help us distinguish between colours.</p>
+<ul>
+<li>New binary features indicating whether cards had boosted or variable power/toughness (e.g. when these values depend on other cards or external elements)</li>
+<li>New features that indicate whether cards have the ability to modify the power and toughness of <em>other</em> cards, parsed from the card text</li>
+<li>New binary feature indicating when cards have mana triggered abilities (extra abilities that you can trigger during gameplay)</li>
+<li>One-hot encode the supertypes and types (there are too many subtypes so I&rsquo;ve ignored those)</li>
+<li>New binary features to identify the presence of specific keyword abilities and actions in the descriptive text (MTG game designers match keywords to colours very consciously so we want to capture these to train the classifier.)</li>
+</ul>
+<p>Further feature engineering, including evaluating the need for scaling or dimensionality reduction, will be covered in the next blogpost.</p>
+<h3 id="data-visualisation-and-exploration">Data visualisation and exploration</h3>
+<p>Now we&rsquo;ve done our initial manipulations it&rsquo;s time to explore the data.</p>
+<h5 id="distribution-of-colours-across-all-cards--different-card-types">Distribution of colours across all cards &amp; different card types</h5>
+<p><img src="/card_color_count.png" alt="card_color_count.png"></p>
+<p>Very even split across the full dataset.</p>
+<p><img src="/creature_color_count.png" alt="creature_color_count.png"></p>
+<p>Filtering just to creatures, which is what we&rsquo;ll do for the model, introduces a slight imbalance - more green creatures, fewer blue creatures. Let&rsquo;s take a look at the colour distribution for all card types.</p>
+<p><img src="/card_type_by_color.png" alt="card_type_by_color.png"></p>
+<p>Creatures are slightly more likely to be green. Enchantments are more likely to be white, and instants are more likely to be blue. This is consistent with the colour identities - green aligns to life and evolution, and this includes flooding the battlefield with creatures. Enchantments provide white with protections, like the popular <a href="https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=489609"><em>Pacifism</em></a> card. Instants suit the blue playing style - manipulating the mechanics of the game with more reliance on spells than creatures (relative to other colours).</p>
+<p><img src="/green_white_blue_cardtype_examples.png" alt="green_white_blue_cardtype_examples.png"></p>
+<p>As already mentioned this project will focus on creatures, but maybe in the future I&rsquo;ll look at other card types too!</p>
+<h5 id="mana-cost-power-toughness-and-loyalty">Mana cost, power, toughness and loyalty</h5>
+<p>Let&rsquo;s look at the numeric fields! A quick look at the means point to some small but interesting differences in average power and toughness across the colours.</p>
+<p><img src="/power_toughness_color_avgs_and_rel.png" alt="power_toughness_color_avgs_and_rel.png"></p>
+<p>Green has the highest average power and toughness (hence the aforementioned <em>big stompy bois</em>). Red has fairly high power but the lowest average toughness, which speaks to its quick fire, potentially more risky playing style. Looking at the final set of values, blue and white appear to have the highest toughness:power ratios, suggesting they are more defensive.</p>
+<p>Using Python&rsquo;s <code>seaborn</code> package and its <code>pairplot</code> function we can look across the 4 numeric variables and their relationships in one visualisation.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#f92672">import</span> seaborn <span style="color:#f92672">as</span> sns
+
+<span style="color:#75715e">#set grey background so the white markers show up</span>
+sns<span style="color:#f92672">.</span>set(rc<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;axes.facecolor&#39;</span>:<span style="color:#e6db74">&#39;#dbdbdb&#39;</span>, <span style="color:#e6db74">&#39;figure.facecolor&#39;</span>:<span style="color:#e6db74">&#39;#ebebeb&#39;</span>})
+sns<span style="color:#f92672">.</span>pairplot(cards_numeric_variables_df\
+             ,hue <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;consolidated_colors&#39;</span>\
+             ,palette <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;Green&#39;</span>: <span style="color:#e6db74">&#39;green&#39;</span>\
+                        ,<span style="color:#e6db74">&#39;Blue&#39;</span>: <span style="color:#e6db74">&#39;blue&#39;</span>\
+                        ,<span style="color:#e6db74">&#39;Black&#39;</span>: <span style="color:#e6db74">&#39;grey&#39;</span>\
+                        ,<span style="color:#e6db74">&#39;Red&#39;</span>: <span style="color:#e6db74">&#39;red&#39;</span>\
+                        ,<span style="color:#e6db74">&#39;White&#39;</span>: <span style="color:#e6db74">&#39;white&#39;</span>}\
+             ,height <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>\
+             ,plot_kws<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;alpha&#39;</span>:<span style="color:#ae81ff">0.5</span>})
+</code></pre></div><p><img src="/pairplot_cmc_power_toughness_loyalty.png" alt="pairplot_cmc_power_toughness_loyalty.png"></p>
+<p>Although the average power and toughness values did vary, the density plots on the diagonal above show that ultimately the colour distributions are very similar across <code>cmc</code> (converted mana cost), <code>power</code> and <code>toughness</code>. These fields might not be that helpful in distinguishing between colours, but we&rsquo;ll see.</p>
+<p><code>loyalty</code> counters, which are specific to the &lsquo;Planeswalker&rsquo; card type in MTG, diverge a bit more across the colours. Green planeswalkers start with lower loyalty counters, whereas red planeswalkers appear to start with more.</p>
+<p>All the numeric variables seem to have a roughly linear relationship - the higher the mana cost, the higher power, toughness and loyalty are likely to be too.</p>
+<p>Let&rsquo;s take a closer look at the relationship between power and toughness, which I&rsquo;ve plotted using the <code>matplotlib</code> package.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#f92672">as</span> plt
+
+<span style="color:#75715e"># get counts of cards for all combinations of colour, power and toughness</span>
+power_toughness_df <span style="color:#f92672">=</span> cards_df_13[[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>,<span style="color:#e6db74">&#39;power&#39;</span>,<span style="color:#e6db74">&#39;toughness&#39;</span>,<span style="color:#e6db74">&#39;id&#39;</span>]]<span style="color:#f92672">.</span>groupby([<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>,<span style="color:#e6db74">&#39;power&#39;</span>,<span style="color:#e6db74">&#39;toughness&#39;</span>])<span style="color:#f92672">.</span>count()<span style="color:#f92672">.</span>reset_index()<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;id&#39;</span>:<span style="color:#e6db74">&#39;cards&#39;</span>})
+power_toughness_df[<span style="color:#e6db74">&#39;cards&#39;</span>] <span style="color:#f92672">=</span> power_toughness_df[<span style="color:#e6db74">&#39;cards&#39;</span>]<span style="color:#f92672">.</span>astype(float)
+
+<span style="color:#75715e"># plot scatter</span>
+plt<span style="color:#f92672">.</span>style<span style="color:#f92672">.</span>use(<span style="color:#e6db74">&#39;ggplot&#39;</span>)
+
+plt<span style="color:#f92672">.</span>figure(figsize <span style="color:#f92672">=</span> (<span style="color:#ae81ff">12</span>,<span style="color:#ae81ff">10</span>))
+
+<span style="color:#75715e">#create some dictionaries that will distribute the colours around axes to prevent overlap</span>
+alignments_around_x_axis <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;Black&#39;</span>: <span style="color:#ae81ff">0</span>\
+                           ,<span style="color:#e6db74">&#39;Red&#39;</span>:<span style="color:#ae81ff">0.15</span>\
+                           ,<span style="color:#e6db74">&#39;White&#39;</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">0.15</span>\
+                           ,<span style="color:#e6db74">&#39;Blue&#39;</span>:<span style="color:#ae81ff">0.15</span>\
+                           ,<span style="color:#e6db74">&#39;Green&#39;</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">0.15</span>}
+
+alignments_around_y_axis <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;Black&#39;</span>: <span style="color:#ae81ff">0</span>\
+                           ,<span style="color:#e6db74">&#39;Red&#39;</span>:<span style="color:#ae81ff">0.15</span>\
+                           ,<span style="color:#e6db74">&#39;White&#39;</span>:<span style="color:#ae81ff">0.15</span>\
+                           ,<span style="color:#e6db74">&#39;Blue&#39;</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">0.15</span>\
+                           ,<span style="color:#e6db74">&#39;Green&#39;</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">0.15</span>}
+
+<span style="color:#66d9ef">for</span> col <span style="color:#f92672">in</span> [<span style="color:#e6db74">&#39;Black&#39;</span>,<span style="color:#e6db74">&#39;Red&#39;</span>,<span style="color:#e6db74">&#39;White&#39;</span>,<span style="color:#e6db74">&#39;Blue&#39;</span>,<span style="color:#e6db74">&#39;Green&#39;</span>]:
+    <span style="color:#66d9ef">if</span> col <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;White&#39;</span>:
+        plt<span style="color:#f92672">.</span>scatter(x <span style="color:#f92672">=</span> power_toughness_df[power_toughness_df[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>] <span style="color:#f92672">==</span> col][<span style="color:#e6db74">&#39;toughness&#39;</span>]<span style="color:#f92672">+</span>alignments_around_x_axis[col]\
+        ,y <span style="color:#f92672">=</span> power_toughness_df[power_toughness_df[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>] <span style="color:#f92672">==</span> col][<span style="color:#e6db74">&#39;power&#39;</span>]<span style="color:#f92672">+</span>alignments_around_y_axis[col]\
+        ,s <span style="color:#f92672">=</span> [i<span style="color:#f92672">+</span><span style="color:#ae81ff">10</span> <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> power_toughness_df[power_toughness_df[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>] <span style="color:#f92672">==</span> col][<span style="color:#e6db74">&#39;cards&#39;</span>]]\
+        ,c <span style="color:#f92672">=</span> col, alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.6</span>,edgecolor <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;black&#39;</span>) <span style="color:#75715e">#add a black edgecolor for white to make it more visible</span>
+    <span style="color:#66d9ef">else</span>:
+        plt<span style="color:#f92672">.</span>scatter(x <span style="color:#f92672">=</span> power_toughness_df[power_toughness_df[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>] <span style="color:#f92672">==</span> col][<span style="color:#e6db74">&#39;toughness&#39;</span>]<span style="color:#f92672">+</span>alignments_around_x_axis[col]\
+               ,y <span style="color:#f92672">=</span> power_toughness_df[power_toughness_df[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>] <span style="color:#f92672">==</span> col][<span style="color:#e6db74">&#39;power&#39;</span>]<span style="color:#f92672">+</span>alignments_around_y_axis[col]\
+               ,s <span style="color:#f92672">=</span> [i<span style="color:#f92672">+</span><span style="color:#ae81ff">10</span> <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> power_toughness_df[power_toughness_df[<span style="color:#e6db74">&#39;consolidated_colors&#39;</span>] <span style="color:#f92672">==</span> col][<span style="color:#e6db74">&#39;cards&#39;</span>]]\
+               ,c <span style="color:#f92672">=</span> col, alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.6</span>)
+
+plt<span style="color:#f92672">.</span>xticks(range(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">18</span>));
+plt<span style="color:#f92672">.</span>yticks(range(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">18</span>));
+
+plt<span style="color:#f92672">.</span>ylabel(<span style="color:#e6db74">&#34;Power&#34;</span>, fontsize<span style="color:#f92672">=</span><span style="color:#ae81ff">15</span>)
+plt<span style="color:#f92672">.</span>xlabel(<span style="color:#e6db74">&#34;Toughness&#34;</span>, fontsize<span style="color:#f92672">=</span><span style="color:#ae81ff">15</span>)
+plt<span style="color:#f92672">.</span>plot([<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">17</span>],[<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">17</span>], color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;lightgrey&#39;</span>, linestyle<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;dashed&#39;</span>, linewidth<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+plt<span style="color:#f92672">.</span>show()
+</code></pre></div><p><img src="/power_toughness_scatter.png" alt="power_toughness_scatter.png"></p>
+<p>Again, power and toughness tend to be pretty equally balanced across all colours, with most cards having a 1:1 ratio or close. A couple of those earlier insights come through again - white and blue are more present under the dashed line, having a higher toughness than power indicative of their defensive nature.</p>
+<p>We can also see some clear outliers! Blue has the highest toughness, with a 0 power/17 toughness card in the form of a Leviathan Crab called <em>Charix, the Raging Isle</em>. There is also a couple of 0 power/13 toughness cards in black and green - two complimentary Tree cards. The green <em>Tree of Redemption</em> allows the player to absorb the tree&rsquo;s toughness into their own life points (in keeping with the colour&rsquo;s life-giving qualities), while the black <em>Tree of Perdition</em> overrides an opponent&rsquo;s life points with the same mechanism.</p>
+<p><img src="/low_power_high_toughness.png" alt="low_power_high_toughness.png"></p>
+<p>There are a couple of outliers in the opposite direction too with <a href="https://gatherer.wizards.com/pages/card/Details.aspx?multiverseid=130713">high power</a> and <a href="https://gatherer.wizards.com/pages/card/Details.aspx?multiverseid=140239">low toughness</a>. I&rsquo;ll need to decide later on if these should be excluded from the training data.</p>
+<h4 id="creatures-with-variable-power-and-toughness-or-the-ability-to-modify-the-power-and-toughness-of-other-creatures">Creatures with variable power and toughness, or the ability to modify the power and toughness of other creatures</h4>
+<p>When cleaning up the data, I created a variable that captures whether the power and toughness values were variable - e.g. dependent on player lands, life points, or other elements of the game.</p>
+<p><img src="/creatures_variable_power_barchart.png" alt="creatures_variable_power_barchart.png"></p>
+<p>Cards with variable power are much more likely to be green, but it&rsquo;s worth noting there aren&rsquo;t many of these in total across the dataset. The distribution for variable toughness looks much the same. Here are some examples of cards with variable power and toughness - green is the colour of nature and fertility, so it makes sense that its values would depend on the player&rsquo;s other land and creature cards.</p>
+<p><img src="/variable_power_green_cards.png" alt="variable_power_green_cards.png"></p>
+<p>I also parsed the text of all the cards for power and toughness modifiers, i.e. when a card is able to affect the power and toughness values of <em>other cards</em>. A pairplot looking at the full dataset of cards shows some quite distinct colour behaviour; green and red cards are more likely to boost the power and toughness of other cards, whereas blue and black are more likely to weaken other cards.</p>
+<p><img src="/pairplot_power_toughness_modifiers.png" alt="pairplot_power_toughness_modifiers.png"></p>
+<p>Filtering just to creatures, we get fewer datapoints (only about 2.5k out of the total 9.2k creature cards have power or toughness modifiers in their text). However, the colour patterns are the same. Hopefully these features will be useful for training our model!</p>
+<p><img src="/pairplot_power_toughness_modifier_creatures.png" alt="pairplot_power_toughness_modifier_creatures.png"></p>
+<p>Here&rsquo;s a snapshot of the data with some examples of cards with negative modifiers at the top, and positive modifiers at the bottom.</p>
+<p><img src="/power_toughness_modifier_creature_examples.png" alt="power_toughness_modifier_creature_examples.png"></p>
+<p><img src="/neg_pos_modifiers.png" alt="neg_pos_modifiers.png"></p>
+<h4 id="colours-vs-keyword-abilities-and-actions">Colours vs. keyword abilities and actions</h4>
+<p>Keyword abilities and actions are specific card mechanisms, like &lsquo;double strike&rsquo; which allows a creature to attack twice or &lsquo;sacrifice&rsquo; which allows the player to sacrifice a card for a desired effect.</p>
+<p><img src="/creatures_keyword_abilities_colors.png" alt="creatures_keyword_abilities_colors.png"></p>
+<p>Looking at &lsquo;keyword abilities&rsquo; first, it&rsquo;s clear that these have very specific relationships with individual colours. Blue and white creatures are much more likely to be <code>flying</code> - especially compared to red and green. Green creatures <code>trample</code> and <code>reach</code>, red creatures have <code>haste</code>, white creatures have <code>vigilance</code> and <code>lifelink</code>, and black creatures have <code>deathtouch</code>.</p>
+<p><img src="/creatures_keyword_actions_colors.png" alt="creatures_keyword_actions_colors.png"></p>
+<p>&lsquo;Keyword actions&rsquo; also have strong colour affinities - black creatures in particular align strongly with <code>sacrifice</code>, <code>destroy</code>, <code>discard</code> and <code>exile</code> actions. <code>mill</code> and <code>scry</code> are very blue, and <code>fight</code> is very green - though there are fewer of these cards in general.</p>
+<p>This isn&rsquo;t a surprise, because MTG&rsquo;s designers are very deliberate about these relationships. Every keyword has &lsquo;primary&rsquo;, &lsquo;secondary&rsquo; and &lsquo;tertiary&rsquo; colours ascribed to them as <a href="https://magic.wizards.com/en/articles/archive/making-magic/mechanical-color-pie-2017-2017-06-05">this summary</a> lays out - the abilities and actions were designed with specific colour philosophies in mind.</p>
+<h3 id="stay-tuned-for-part-2">Stay tuned for part 2!</h3>
+<p>After an initial look, the 5 color identities seem pretty consistent with their attributes, but there&rsquo;s a lot of overlap too. Some of the features look promising for training a colour classifier - particularly the keywords, and the power/toughness modifier values. Stay tuned for part 2 which will train and test a model, and make some conclusions about the results!</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/posts">Projects</a></li>
+         
+          <li><a href="/tags">Tags</a></li>
+         
+          <li><a href="/about">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#loading-the-data-and-initial-preprocessing">Loading the data and initial preprocessing</a></li>
+        <li><a href="#feature-engineering---generating-new-features">Feature engineering - generating new features</a></li>
+        <li><a href="#data-visualisation-and-exploration">Data visualisation and exploration</a>
+          <ul>
+            <li></li>
+            <li><a href="#creatures-with-variable-power-and-toughness-or-the-ability-to-modify-the-power-and-toughness-of-other-creatures">Creatures with variable power and toughness, or the ability to modify the power and toughness of other creatures</a></li>
+            <li><a href="#colours-vs-keyword-abilities-and-actions">Colours vs. keyword abilities and actions</a></li>
+          </ul>
+        </li>
+        <li><a href="#stay-tuned-for-part-2">Stay tuned for part 2!</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&text=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&is_video=false&description=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering&body=Check out this article: https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&title=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&name=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering&description=Three%20lockdowns%20and%20a%20year%20of%20quarantine%20later%2c%20I%26rsquo%3bve%20found%20myself%20with%20a%20few%20more%20hobbies%20and%20interests.%20Not%20quite%20a%20daily%20Yoga%20with%20Adriene%20habit%20%28though%20I%20did%20manage%20about%20half%20a%20month%20before%20falling%20off%20that%20wagon%29%20-%20but%20I%20have%20been%20playing%20a%20lot%20of%20Magic%3a%20The%20Gathering%20with%20friends.%0aTo%20those%20unacquainted%2c%20MTG%20was%20released%20in%201993%20and%20is%20the%20world%26rsquo%3bs%20first%20trading%20card%20game%20-%20these%20days%20it%20also%20exists%20as%20an%20impressive%20and%20pandemic-friendly%20online%20interface.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fwanga02.github.io%2fposts%2fbuilding-a-colour-classifier-for-magic-the-gathering-cards-part-1%2f&t=Building%20a%20colour%20classifier%20for%20Magic%3a%20The%20Gathering%20cards%20-%20Part%201%3a%20Data%20Exploration%20and%20Feature%20Engineering">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2021  Aileen Wang 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">Projects</a></li>
+         
+        <li><a href="/tags">Tags</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+</html>

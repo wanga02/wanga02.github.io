@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>preprocessing on aileen wang</title>
+    <link>https://wanga02.github.io/categories/preprocessing/</link>
+    <description>Recent content in preprocessing on aileen wang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Aileen Wang</copyright>
+    <lastBuildDate>Sat, 20 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://wanga02.github.io/categories/preprocessing/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building a colour classifier for Magic: The Gathering cards - Part 1: Data Exploration and Feature Engineering</title>
+      <link>https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/</link>
+      <pubDate>Sat, 20 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/</guid>
+      <description>Three lockdowns and a year of quarantine later, I&amp;rsquo;ve found myself with a few more hobbies and interests. Not quite a daily Yoga with Adriene habit (though I did manage about half a month before falling off that wagon) - but I have been playing a lot of Magic: The Gathering with friends.
+To those unacquainted, MTG was released in 1993 and is the world&amp;rsquo;s first trading card game - these days it also exists as an impressive and pandemic-friendly online interface.</description>
+    </item>
+    
+  </channel>
+</rss>

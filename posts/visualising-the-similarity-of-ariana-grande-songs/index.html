@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Visualising the similarity of Ariana Grande songs using dimensionality reduction | aileen wang</title>
+  <meta name="description" content="I&#39;m a principal data analyst working at the BBC, analysing podcast and music listening for BBC Sounds. I&#39;ve built a data career from an arts background, and enjoy playing around where those areas intersect. R and Python. Interested in data visualisation (like every other analyst with a website) both digital and analogue, text analysis, machine learning, digital media and pop culture. Always happy to collaborate - reach out!">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Visualising the similarity of Ariana Grande songs using dimensionality reduction" />
+<meta property="og:description" content="Ariana Grande is one of the most recognisable faces of pop right now, with an equally recognisable voice and musical style. She&rsquo;s known for making pop-R&amp;B hits, with more recent albums particularly influenced by hip hop, trap and electronic music/EDM.
+I&rsquo;ve been listening to a lot of AG lately, who I find easy to binge because of the consistency in sound across her albums. But it&rsquo;s also made me notice how different some of the songs are, like the light is coming from Sweetener (2018) which is so repetitive that I can&rsquo;t actually listen to it, trap-pop banger 7 rings (thank u, next - 2019), or her trend of acapella/classical album openers like Intro (My Everything - 2014), raindrops (an angel cried) (Sweetener - 2018), and shut up (Positions - 2021)." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/" />
+<meta property="article:published_time" content="2021-05-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-05-09T00:00:00+00:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Visualising the similarity of Ariana Grande songs using dimensionality reduction"/>
+<meta name="twitter:description" content="Ariana Grande is one of the most recognisable faces of pop right now, with an equally recognisable voice and musical style. She&rsquo;s known for making pop-R&amp;B hits, with more recent albums particularly influenced by hip hop, trap and electronic music/EDM.
+I&rsquo;ve been listening to a lot of AG lately, who I find easy to binge because of the consistency in sound across her albums. But it&rsquo;s also made me notice how different some of the songs are, like the light is coming from Sweetener (2018) which is so repetitive that I can&rsquo;t actually listen to it, trap-pop banger 7 rings (thank u, next - 2019), or her trend of acapella/classical album openers like Intro (My Everything - 2014), raindrops (an angel cried) (Sweetener - 2018), and shut up (Positions - 2021)."/>
+
+  
+  
+    
+  
+  
+  <link rel="stylesheet" href="https://wanga02.github.io/css/style-light.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://wanga02.github.io/images/favicon.ico" />
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">Projects</a></li>
+         
+        <li><a href="/tags">Tags</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&text=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&is_video=false&description=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction&body=Check out this article: https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&name=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction&description=Ariana%20Grande%20is%20one%20of%20the%20most%20recognisable%20faces%20of%20pop%20right%20now%2c%20with%20an%20equally%20recognisable%20voice%20and%20musical%20style.%20She%26rsquo%3bs%20known%20for%20making%20pop-R%26amp%3bB%20hits%2c%20with%20more%20recent%20albums%20particularly%20influenced%20by%20hip%20hop%2c%20trap%20and%20electronic%20music%2fEDM.%0aI%26rsquo%3bve%20been%20listening%20to%20a%20lot%20of%20AG%20lately%2c%20who%20I%20find%20easy%20to%20binge%20because%20of%20the%20consistency%20in%20sound%20across%20her%20albums.%20But%20it%26rsquo%3bs%20also%20made%20me%20notice%20how%20different%20some%20of%20the%20songs%20are%2c%20like%20the%20light%20is%20coming%20from%20Sweetener%20%282018%29%20which%20is%20so%20repetitive%20that%20I%20can%26rsquo%3bt%20actually%20listen%20to%20it%2c%20trap-pop%20banger%207%20rings%20%28thank%20u%2c%20next%20-%202019%29%2c%20or%20her%20trend%20of%20acapella%2fclassical%20album%20openers%20like%20Intro%20%28My%20Everything%20-%202014%29%2c%20raindrops%20%28an%20angel%20cried%29%20%28Sweetener%20-%202018%29%2c%20and%20shut%20up%20%28Positions%20-%202021%29.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&t=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#getting-track-info-and-audio-features-from-spotify-api">Getting track info and audio features from Spotify API</a></li>
+        <li><a href="#visualising-the-discography-with-tsne">Visualising the discography with tSNE</a></li>
+        <li><a href="#anomalous-songs---outlier-detection-using-isolationforest-and-dbscan">Anomalous songs - outlier detection using IsolationForest and DBSCAN</a>
+          <ul>
+            <li><a href="#isolationforest">IsolationForest</a></li>
+            <li><a href="#dbscan">DBSCAN</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Visualising the similarity of Ariana Grande songs using dimensionality reduction
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2021-05-09 00:00:00 &#43;0000 UTC" itemprop="datePublished">2021-05-09</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/ariana-grande">ariana grande</a>
+            
+            
+            <a class="category-link" href="/categories/spotify">spotify</a>
+            
+             ,  
+            <a class="category-link" href="/categories/spotify-api">spotify api</a>
+            
+             ,  
+            <a class="category-link" href="/categories/anomaly-detection">anomaly detection</a>
+            
+             ,  
+            <a class="category-link" href="/categories/outlier-analysis">outlier analysis</a>
+            
+             ,  
+            <a class="category-link" href="/categories/tsne">tsne</a>
+            
+             ,  
+            <a class="category-link" href="/categories/umap">umap</a>
+            
+             ,  
+            <a class="category-link" href="/categories/dbscan">dbscan</a>
+            
+             ,  
+            <a class="category-link" href="/categories/isolation-forest">isolation forest</a>
+            
+             ,  
+            <a class="category-link" href="/categories/random-forest">random forest</a>
+            
+             ,  
+            <a class="category-link" href="/categories/machine-learning">machine learning</a>
+            
+             ,  
+            <a class="category-link" href="/categories/data-visualisation">data visualisation</a>
+            
+        </div>
+        
+        
+        <div class="article-tag">
+            <i class="fas fa-tag"></i>
+            
+            
+            <a class="tag-link" href="/tags/classifier" rel="tag">classifier</a>
+            
+            
+            <a class="tag-link" href="/tags/machine-learning" rel="tag">machine learning</a>
+            
+             ,  
+            <a class="tag-link" href="/tags/modelling" rel="tag">modelling</a>
+            
+        </div>
+        
+      </div>
+    </header>
+
+
+    <div class="content" itemprop="articleBody">
+      <p>Ariana Grande is one of the most recognisable faces of pop right now, with an equally recognisable voice and musical style. She&rsquo;s known for making pop-R&amp;B hits, with more recent albums particularly influenced by hip hop, trap and electronic music/EDM.</p>
+<p><img src="/ariana_albums.jpg" alt="ariana_albums.jpg"></p>
+<p>I&rsquo;ve been listening to a <em>lot</em> of AG lately, who I find easy to binge because of the consistency in sound across her albums. But it&rsquo;s also made me notice how different some of the songs are, like <em>the light is coming</em> from Sweetener (2018) which is so repetitive that I can&rsquo;t actually listen to it, trap-pop banger <em>7 rings</em> (thank u, next - 2019), or her trend of acapella/classical album openers like <em>Intro</em> (My Everything - 2014), <em>raindrops (an angel cried)</em> (Sweetener - 2018), and <em>shut up</em> (Positions - 2021).</p>
+<p>This post examines all of Ariana Grande&rsquo;s songs by their Spotify audio features, and maps them out visually by similarity using dimensionality reduction techniques. If you&rsquo;re just interested in the visualisation and analysis, <a href="https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/#visualising-the-discography-with-tsne">jump forwards here</a>.</p>
+<h3 id="getting-track-info-and-audio-features-from-spotify-api">Getting track info and audio features from Spotify API</h3>
+<p>The <code>spotipy</code> Python package makes it pretty easy to interact with the Spotify API. I won&rsquo;t cover instructions for doing so but you can find the documentation <a href="https://spotipy.readthedocs.io/en/latest/#installation">here</a>. I based my code on an example implementation <a href="https://github.com/tgel0/spotify-data/blob/master/notebooks/SpotifyDataRetrieval.ipynb">here</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#75715e">#import python modules for data manipulation and visualisation</span>
+<span style="color:#f92672">import</span> pandas <span style="color:#f92672">as</span> pd
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">import</span> matplotlib <span style="color:#f92672">as</span> plt
+<span style="color:#f92672">import</span> mplcursors <span style="color:#75715e">#allows me to generate data labels interactively as part of data exploration</span>
+<span style="color:#f92672">import</span> PyQt5 <span style="color:#75715e">#allows me to generate data labels interactively as part of data exploration</span>
+<span style="color:#f92672">import</span> seaborn <span style="color:#f92672">as</span> sns
+
+<span style="color:#75715e">#import the spotipy modules</span>
+<span style="color:#f92672">import</span> spotipy
+<span style="color:#f92672">from</span> spotipy.oauth2 <span style="color:#f92672">import</span> SpotifyClientCredentials
+
+<span style="color:#75715e">#get client ID and client secret from web app dashboard</span>
+cid <span style="color:#f92672">=</span> xx
+secret <span style="color:#f92672">=</span> xx
+
+client_credentials_manager <span style="color:#f92672">=</span> SpotifyClientCredentials(client_id<span style="color:#f92672">=</span>cid, client_secret<span style="color:#f92672">=</span>secret)
+sp <span style="color:#f92672">=</span> spotipy<span style="color:#f92672">.</span>Spotify(client_credentials_manager <span style="color:#f92672">=</span> client_credentials_manager)
+
+<span style="color:#75715e">#create empty lists where the results are going to be stored</span>
+artist_name <span style="color:#f92672">=</span> []
+artists_num <span style="color:#f92672">=</span> []
+album_name <span style="color:#f92672">=</span> []
+available_markets <span style="color:#f92672">=</span> []
+track_name <span style="color:#f92672">=</span> []
+popularity <span style="color:#f92672">=</span> []
+track_id <span style="color:#f92672">=</span> []
+
+<span style="color:#75715e">#get all relevant info for Ariana Grande tracks via a &#39;search&#39; query to the API</span>
+<span style="color:#75715e">#this took about 2 seconds to run</span>
+<span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">400</span>,<span style="color:#ae81ff">50</span>):
+    track_results <span style="color:#f92672">=</span> sp<span style="color:#f92672">.</span>search(q<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;artist:&#34;ariana grande&#34;&#39;</span>, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;track&#39;</span>, limit<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>,offset<span style="color:#f92672">=</span>i)
+    <span style="color:#66d9ef">for</span> i, t <span style="color:#f92672">in</span> enumerate(track_results[<span style="color:#e6db74">&#39;tracks&#39;</span>][<span style="color:#e6db74">&#39;items&#39;</span>]):
+        artist_name<span style="color:#f92672">.</span>append(t[<span style="color:#e6db74">&#39;artists&#39;</span>][<span style="color:#ae81ff">0</span>][<span style="color:#e6db74">&#39;name&#39;</span>])
+        artists_num<span style="color:#f92672">.</span>append(len(t[<span style="color:#e6db74">&#39;artists&#39;</span>]))
+        album_name<span style="color:#f92672">.</span>append(t[<span style="color:#e6db74">&#39;album&#39;</span>][<span style="color:#e6db74">&#39;name&#39;</span>])
+        available_markets<span style="color:#f92672">.</span>append(t[<span style="color:#e6db74">&#39;available_markets&#39;</span>])
+        track_name<span style="color:#f92672">.</span>append(t[<span style="color:#e6db74">&#39;name&#39;</span>])
+        track_id<span style="color:#f92672">.</span>append(t[<span style="color:#e6db74">&#39;id&#39;</span>])
+        popularity<span style="color:#f92672">.</span>append(t[<span style="color:#e6db74">&#39;popularity&#39;</span>])
+
+<span style="color:#75715e">#turn lists into a df</span>
+df_ariana_tracks <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame({<span style="color:#e6db74">&#39;artist_name&#39;</span>:artist_name,
+                                 <span style="color:#e6db74">&#39;artists_num&#39;</span>:artists_num,
+                                 <span style="color:#e6db74">&#39;album_name&#39;</span>:album_name,
+                                <span style="color:#e6db74">&#39;track_name&#39;</span>:track_name,
+                                <span style="color:#e6db74">&#39;track_id&#39;</span>:track_id,
+                                 <span style="color:#e6db74">&#39;available_markets&#39;</span>:available_markets,
+                                <span style="color:#e6db74">&#39;popularity&#39;</span>:popularity})
+</code></pre></div><p>This snippet generates the following dataframe.</p>
+<p><img src="/ariana_tracks_info_initial.png" alt="ariana_tracks_info_initial.png"></p>
+<p>Now we can grab the audio features for each track. I also filtered out any repeated tracks, remixes, covers or tracks released for soundtracks which I figured were less representative of her own musical style. This is what the final dataframe looks like:</p>
+<p><img src="/ariana_tracks_info_merged.png" alt="ariana_tracks_info_merged.png"></p>
+<p>Spotify describes its audio features as follows:</p>
+<ul>
+<li><strong>acousticness</strong>: a confidence measure of whether the track is acoustic (0.0-1.0).</li>
+<li><strong>danceability</strong>: how suitable a track is for dancing based on tempo, rhythm stability, beat strength, overall regularity and other elements (0.0-1.0).</li>
+<li><strong>energy</strong>: a perceptual measure of intensity and activity, or how &lsquo;fast, loud and noisy&rsquo; a track is (0.0-1.0).</li>
+<li><strong>loudness</strong>: loudness in dB (averaged across the track, typically between -60.0-0.0).</li>
+<li><strong>instrumentalness</strong>: a confidence measure of whether a track contains no vocals/lyrics (0.0-1.0).</li>
+<li><strong>liveness</strong>: probability that the track was performed live, based on whether an audience is present.</li>
+<li><strong>speechiness</strong>: detects presence of spoken words in a track (0.0-1.0).</li>
+<li><strong>valence</strong>: the musical &lsquo;positiveness&rsquo; conveyed by a track, i.e. sounding happy, cheerful or euphoric rather than sad, depressed or angry (0.0-1.0).</li>
+</ul>
+<p><img src="/ariana_audio_features_described.png" alt="ariana_audio_features_described.png"></p>
+<p>Python&rsquo;s <code>.describe()</code> attribute gives us the quick summary above. Although her discography is fairly danceable and energetic on average, the <code>min</code> and <code>max</code> values indicate a large range from sadder and slower songs to higher-energy, happier songs. They are typically melodic rather than &lsquo;speechy&rsquo;, although there are a few tracks that are much speechier than the rest. Similarly, although the songs aren&rsquo;t very acoustic in general, <em>some</em> songs are <em>very</em> acoustic. The <code>pairplot</code> function from <code>seaborn</code> visualises the distributions more clearly.</p>
+<p><img src="/ariana_pairplot_audio_features.png" alt="ariana_pairplot_audio_features.png"></p>
+<p>The histograms across the diagonal are interesting, and confirm that danceability, energy and valence are quite evenly spread. We can also see the right skew more clearly for speechiness and acousticness. After some tinkering I ended up excluding the energy variable. It&rsquo;s very well correlated with loudness, and is more evenly spread which makes it less useful for separating the tracks.</p>
+<p>We should see whether the albums are separable by their audio feature profiles in the final visualisation, but let&rsquo;s take a sneak peak at two of the features first.</p>
+<p><img src="/ariana_danceability_valence_scatter.png" alt="ariana_danceability_valence_scatter.png"></p>
+<p>There&rsquo;s a vague positive relationship between danceability and valence/positivity which is unsurprising, but a lot of variation too. From first glance it doesn&rsquo;t look like the albums naturally cluster away from each other - this would make sense given how consistent her sound has been across albums.</p>
+<h3 id="visualising-the-discography-with-tsne">Visualising the discography with tSNE</h3>
+<p>Now let&rsquo;s see if this holds true when considering all the audio features! I&rsquo;ll be using various <code>sklearn</code> modules for this. <a href="https://www.youtube.com/watch?v=NEaUSP4YerM">This StatQuest video</a> is a good introduction to tSNE, and <a href="https://distill.pub/2016/misread-tsne/">this</a> is a really useful summary of how the perplexity parameter affects results (and other things to bear in mind when interpreting tSNE plots).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#75715e">#import python modules</span>
+<span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span>  MinMaxScaler <span style="color:#75715e">#preprocessing</span>
+
+<span style="color:#f92672">from</span> sklearn.manifold <span style="color:#f92672">import</span> TSNE <span style="color:#75715e">#dimensionality reduction</span>
+<span style="color:#f92672">import</span> umap.umap_ <span style="color:#f92672">as</span> umap <span style="color:#75715e">#dimensionality reduction</span>
+
+<span style="color:#75715e">#just selecting the features of interest</span>
+cols_to_keep <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;danceability&#39;</span>,<span style="color:#e6db74">&#39;loudness&#39;</span>,<span style="color:#e6db74">&#39;speechiness&#39;</span>,<span style="color:#e6db74">&#39;acousticness&#39;</span>,<span style="color:#e6db74">&#39;instrumentalness&#39;</span>,<span style="color:#e6db74">&#39;liveness&#39;</span>,<span style="color:#e6db74">&#39;valence&#39;</span>]
+df_ariana_audio_features <span style="color:#f92672">=</span> df_ariana[cols_to_keep]
+
+<span style="color:#75715e">#normalise data</span>
+scaler <span style="color:#f92672">=</span> MinMaxScaler()
+df_ariana_audio_features_final <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame(scaler<span style="color:#f92672">.</span>fit_transform(df_ariana_audio_features), columns <span style="color:#f92672">=</span> df_ariana_audio_features<span style="color:#f92672">.</span>columns)
+
+<span style="color:#75715e">#run tSNE with perplexity 20</span>
+df_ariana_tsne_values <span style="color:#f92672">=</span> df_ariana_audio_features_final<span style="color:#f92672">.</span>values
+df_ariana_tsne_values
+
+ariana_tsne <span style="color:#f92672">=</span> TSNE(
+    n_components<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>,
+    perplexity<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>,
+    verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">.</span>fit_transform(df_ariana_tsne_values)
+
+<span style="color:#75715e">#attach tsne variables to original dataset</span>
+df_final <span style="color:#f92672">=</span> df_ariana
+df_final[<span style="color:#e6db74">&#39;tsne1&#39;</span>] <span style="color:#f92672">=</span> ariana_tsne[:,<span style="color:#ae81ff">0</span>]
+df_final[<span style="color:#e6db74">&#39;tsne2&#39;</span>] <span style="color:#f92672">=</span> ariana_tsne[:,<span style="color:#ae81ff">1</span>]
+</code></pre></div><p>I tested a range of perplexity values. From the initial data exploration I&rsquo;m not expecting the data to cluster particularly clearly - we have acknowledged the consistency of her musical style after all. 20 allowed for similar tracks to pull closer together without forcing them into tight groups.</p>
+<p><img src="/ariana_final_tsne_20px_plot.png" alt="ariana_final_tsne_20px_plot.png"></p>
+<p>The tSNE plot confirms what we saw in the danceability vs. valence graph - every Ariana Grande album spreads across the space, containing tracks that span across her stylistic range. This makes sense. Sweetener (2018) for example contained in one album an Imogen Heap remake <em>goodnight n go</em>, huge anthems like <em>God is a woman</em>, the upbeat and percussive <em>blazed ft. Pharrell Williams</em> and the aforementioned nightmare <em>the light is coming ft. Nicki Minaj</em> (please don&rsquo;t come after me AG stans, I&rsquo;m just a humble analyst).</p>
+<p>Colouring by the original audio features can help us understand why some tracks have grouped together.</p>
+<p><img src="/tsne-by-speechiness-labelled.png" alt="tsne-by-speechiness-labelled.png"></p>
+<p>The clearest group are Ariana&rsquo;s speechy-songs, including trap influenced <em>7 rings</em> and <em>NASA</em> as well as songs featuring rappers or spoken word intros. Within the collection there are 2 subgroups (which separate more clearly with higher perplexity tSNEs); <em>Sometimes</em>, <em>boyfriend (with Social House)</em>, <em>fake smile</em> and <em>You Don&rsquo;t Know Me</em> were more danceable and acoustic than the other tracks.</p>
+<p><a href="https://open.spotify.com/playlist/4or407AuxDU4MYvLBPnNFn?si=bbe674aded374ce7">Click here for the &lsquo;Ariana Grande: speechy songs&rsquo; playlist.</a></p>
+<!-- raw HTML omitted -->
+<p><img src="/tsne-by-acousticness-labelled.png" alt="tsne-by-acousticness-labelled.png"></p>
+<p>We can also identify the most acoustic sounding songs (the ones with more than 0.4 acousticness have been tagged above). These are almost all in the bottom left-hand corner, though you can see the acoustic-speechy subgroup we mentioned before too.</p>
+<p><a href="https://open.spotify.com/playlist/1UtPd7cDba5Pmbzboe2ba7?si=9b043e1bbf1c4582">Click here for the &lsquo;Ariana Grande: acoustic-sounding songs&rsquo; playlist.</a></p>
+<!-- raw HTML omitted -->
+<p><img src="/tsne-by-valence-labelled.png" alt="tsne-by-valence-labelled.png"></p>
+<p>Valence is probably the final clear factor that&rsquo;s visible. I&rsquo;ve labelled the purple most positive-sounding tracks (&gt;0.6), and the yellow most negative-sounding tracks (&lt;0.25). Even just looking at the titles this checks out - the positive tracks group together in the top right and include Christmas songs, <em>successful</em>, <em>Love is Everything</em>, <em>The Way</em> and one of AG&rsquo;s earliest and most popular pop hits <em>Problem</em> ft. Iggy Azalea. These songs were generally more danceable and energetic too.</p>
+<p><a href="https://open.spotify.com/playlist/6aGzA9iq2H9TdZVc8UPHho?si=a8da4b2706fe4e78">Click here for the &lsquo;Ariana Grande: happy and upbeat songs&rsquo; playlist.</a></p>
+<!-- raw HTML omitted -->
+<p><a href="https://open.spotify.com/playlist/7r6KOCT7hHC7FSruIfrQ0s?si=17a5b873596e4736">Click here for the &lsquo;Ariana Grande: sad and downbeat songs&rsquo; playlist.</a></p>
+<!-- raw HTML omitted -->
+<p>Now that we understand this visual map a bit more let&rsquo;s overlay the popularity of the tracks. Spotify&rsquo;s popularity score is determined by the total number of plays a track has and how recent those are, so this is a reflection of what was popular at time of writing (May 2021).</p>
+<p><img src="/tsne-by-popularity-labelled.png" alt="tsne-by-popularity-labelled.png"></p>
+<p>I&rsquo;ve labelled the top quartile of tracks for popularity (&gt; 71). The most popular songs are pretty well spread across the sound profile, though there&rsquo;s discernably fewer labels in the acoustic group on the bottom left. I&rsquo;m not going to be testing any hypotheses about what kinds of AG songs are more popular here but it&rsquo;s interesting to look at!</p>
+<p>I also built some visualisations using UMAP for dimensionality reduction (using Euclidean distance as the chosen metric). I won&rsquo;t include the graphs here as they tell a similar story. The same groups came out clearest with nearest neighbors set to about 10.</p>
+<h3 id="anomalous-songs---outlier-detection-using-isolationforest-and-dbscan">Anomalous songs - outlier detection using IsolationForest and DBSCAN</h3>
+<h4 id="isolationforest">IsolationForest</h4>
+<p>Finally, let&rsquo;s see if we can identify the biggest outliers in her discography algorithmically rather than visually. I first ran IsolationForest using the code below, which identified 10 outlier tracks. IF is an ensemble method that works using the decision tree algorithm. It randomly selects features and split values to isolate outliers, which generate shorter paths in the trees. More info and better explanations <a href="https://dzone.com/articles/spotting-outliers-with-isolation-forest-using-skle">here</a> and <a href="https://towardsdatascience.com/a-brief-overview-of-outlier-detection-techniques-1e0b2c19e561">here</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#75715e">#import python modules</span>
+<span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span>  MinMaxScaler <span style="color:#75715e">#preprocessing</span>
+
+<span style="color:#f92672">from</span> sklearn.ensemble <span style="color:#f92672">import</span> IsolationForest <span style="color:#75715e">#outlier detection</span>
+
+<span style="color:#75715e">#just selecting the features of interest again</span>
+cols_to_keep <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;danceability&#39;</span>,<span style="color:#e6db74">&#39;loudness&#39;</span>,<span style="color:#e6db74">&#39;speechiness&#39;</span>,<span style="color:#e6db74">&#39;acousticness&#39;</span>,<span style="color:#e6db74">&#39;instrumentalness&#39;</span>,<span style="color:#e6db74">&#39;liveness&#39;</span>,<span style="color:#e6db74">&#39;valence&#39;</span>]
+df_ariana_audio_features <span style="color:#f92672">=</span> df_ariana[cols_to_keep]
+
+<span style="color:#75715e">#normalise data again</span>
+scaler <span style="color:#f92672">=</span> MinMaxScaler()
+df_ariana_audio_features_final <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame(scaler<span style="color:#f92672">.</span>fit_transform(df_ariana_audio_features), columns <span style="color:#f92672">=</span> df_ariana_audio_features<span style="color:#f92672">.</span>columns)
+
+<span style="color:#75715e">#run IsolationForest using default contamination = &#39;audio&#39;</span>
+isolation_forest <span style="color:#f92672">=</span> IsolationForest(n_estimators<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+isolation_forest<span style="color:#f92672">.</span>fit(df_ariana_features_filtered_final)
+
+outliers <span style="color:#f92672">=</span> isolation_forest<span style="color:#f92672">.</span>predict(df_ariana_features_filtered_final)
+
+<span style="color:#75715e">#attach outliers variable to original dataset</span>
+df_outliers <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat([df_ariana, pd<span style="color:#f92672">.</span>DataFrame(outliers, columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;outlier&#39;</span>])], axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</code></pre></div><p>Here are the outliers marked out on the tSNE visualisation.</p>
+<p><img src="/ariana_isolationforest_outliers.png" alt="ariana_isolationforest_outliers.png"></p>
+<p>This makes visual sense! We have outliers from those distinct speechy and acoustic groups, and a few more individual outliers. <em>Piano</em> is the only track with a high &lsquo;liveness&rsquo; score (maybe because it incorporates clapping?) and <em>bad idea</em> is the only track with a non-0 &lsquo;instrumentalness&rsquo; score (though it is still only 0.05). <em>the light is coming</em> is picked out too which validates my claim that it&rsquo;s a jarring listen.</p>
+<h4 id="dbscan">DBSCAN</h4>
+<p>Whereas IsolationForest identifies outliers using their inherent anomalous properties, DBSCAN like other clustering techniques first learns the &lsquo;normal&rsquo; profile of the data in order to flag observations that don&rsquo;t fit. More info about <a href="https://towardsdatascience.com/a-brief-overview-of-outlier-detection-techniques-1e0b2c19e561">DBSCAN for anomaly detection here</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="color:#75715e">#import python modules</span>
+<span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span>  MinMaxScaler <span style="color:#75715e">#preprocessing</span>
+
+<span style="color:#f92672">from</span> sklearn.cluster <span style="color:#f92672">import</span> DBSCAN <span style="color:#75715e">#outlier detection</span>
+
+<span style="color:#75715e">#standardise data</span>
+X <span style="color:#f92672">=</span> StandardScaler()<span style="color:#f92672">.</span>fit_transform(df_ariana_features_filtered_final<span style="color:#f92672">.</span>values)
+
+<span style="color:#75715e">#run DBSCAN using eps = 2.0 and min_samples = 2</span>
+db <span style="color:#f92672">=</span> DBSCAN(eps<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, min_samples<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">.</span>fit(X)
+dblabels <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>labels_
+
+<span style="color:#75715e">#attach outliers variable to original dataset</span>
+df_outlier <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat([df_ariana_features_tsne, pd<span style="color:#f92672">.</span>DataFrame(dblabels, columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;dbscan_outlier&#39;</span>])], axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+
+</code></pre></div><p><img src="/ariana_dbscan_outliers.png" alt="ariana_dbscan_outliers.png"></p>
+<p>We get almost the same results as the IsolationForest output except without <em>the light is coming</em>, and with two of the speechy songs (<em>You Don&rsquo;t Know Me</em> and <em>Sometimes</em>) instead of two of the acoustic songs (<em>raindrops</em> and <em>Almost Is Never Enough</em>). I personally think <em>raindrops</em> and <em>Almost Is Never Enough</em> sound much more distinct but that might be because I don&rsquo;t think the other two are particularly speechy. This contention comes down to how the Spotify audio features are generated rather than differences in these anomaly detection methods.</p>
+<p><a href="https://open.spotify.com/playlist/4or407AuxDU4MYvLBPnNFn?si=118b6a0228754e32">Click here for the &lsquo;Ariana Grande outliers&rsquo; playlist.</a></p>
+<!-- raw HTML omitted -->
+<p>I might publish an interactive version of the tSNE visualisation at some point but for now I&rsquo;m pretty happy with what&rsquo;s in here!</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/posts">Projects</a></li>
+         
+          <li><a href="/tags">Tags</a></li>
+         
+          <li><a href="/about">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#getting-track-info-and-audio-features-from-spotify-api">Getting track info and audio features from Spotify API</a></li>
+        <li><a href="#visualising-the-discography-with-tsne">Visualising the discography with tSNE</a></li>
+        <li><a href="#anomalous-songs---outlier-detection-using-isolationforest-and-dbscan">Anomalous songs - outlier detection using IsolationForest and DBSCAN</a>
+          <ul>
+            <li><a href="#isolationforest">IsolationForest</a></li>
+            <li><a href="#dbscan">DBSCAN</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&text=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&is_video=false&description=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction&body=Check out this article: https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&title=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&name=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction&description=Ariana%20Grande%20is%20one%20of%20the%20most%20recognisable%20faces%20of%20pop%20right%20now%2c%20with%20an%20equally%20recognisable%20voice%20and%20musical%20style.%20She%26rsquo%3bs%20known%20for%20making%20pop-R%26amp%3bB%20hits%2c%20with%20more%20recent%20albums%20particularly%20influenced%20by%20hip%20hop%2c%20trap%20and%20electronic%20music%2fEDM.%0aI%26rsquo%3bve%20been%20listening%20to%20a%20lot%20of%20AG%20lately%2c%20who%20I%20find%20easy%20to%20binge%20because%20of%20the%20consistency%20in%20sound%20across%20her%20albums.%20But%20it%26rsquo%3bs%20also%20made%20me%20notice%20how%20different%20some%20of%20the%20songs%20are%2c%20like%20the%20light%20is%20coming%20from%20Sweetener%20%282018%29%20which%20is%20so%20repetitive%20that%20I%20can%26rsquo%3bt%20actually%20listen%20to%20it%2c%20trap-pop%20banger%207%20rings%20%28thank%20u%2c%20next%20-%202019%29%2c%20or%20her%20trend%20of%20acapella%2fclassical%20album%20openers%20like%20Intro%20%28My%20Everything%20-%202014%29%2c%20raindrops%20%28an%20angel%20cried%29%20%28Sweetener%20-%202018%29%2c%20and%20shut%20up%20%28Positions%20-%202021%29.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fwanga02.github.io%2fposts%2fvisualising-the-similarity-of-ariana-grande-songs%2f&t=Visualising%20the%20similarity%20of%20Ariana%20Grande%20songs%20using%20dimensionality%20reduction">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2021  Aileen Wang 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">Projects</a></li>
+         
+        <li><a href="/tags">Tags</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+</html>

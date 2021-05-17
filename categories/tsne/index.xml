@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tsne on aileen wang</title>
+    <link>https://wanga02.github.io/categories/tsne/</link>
+    <description>Recent content in tsne on aileen wang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Aileen Wang</copyright>
+    <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://wanga02.github.io/categories/tsne/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Visualising the similarity of Ariana Grande songs using dimensionality reduction</title>
+      <link>https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/</guid>
+      <description>Ariana Grande is one of the most recognisable faces of pop right now, with an equally recognisable voice and musical style. She&amp;rsquo;s known for making pop-R&amp;amp;B hits, with more recent albums particularly influenced by hip hop, trap and electronic music/EDM.
+I&amp;rsquo;ve been listening to a lot of AG lately, who I find easy to binge because of the consistency in sound across her albums. But it&amp;rsquo;s also made me notice how different some of the songs are, like the light is coming from Sweetener (2018) which is so repetitive that I can&amp;rsquo;t actually listen to it, trap-pop banger 7 rings (thank u, next - 2019), or her trend of acapella/classical album openers like Intro (My Everything - 2014), raindrops (an angel cried) (Sweetener - 2018), and shut up (Positions - 2021).</description>
+    </item>
+    
+  </channel>
+</rss>

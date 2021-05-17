@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>aileen wang</title>
+    <link>https://wanga02.github.io/</link>
+    <description>Recent content on aileen wang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Aileen Wang</copyright>
+    <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://wanga02.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Visualising the similarity of Ariana Grande songs using dimensionality reduction</title>
+      <link>https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/posts/visualising-the-similarity-of-ariana-grande-songs/</guid>
+      <description>Ariana Grande is one of the most recognisable faces of pop right now, with an equally recognisable voice and musical style. She&amp;rsquo;s known for making pop-R&amp;amp;B hits, with more recent albums particularly influenced by hip hop, trap and electronic music/EDM.
+I&amp;rsquo;ve been listening to a lot of AG lately, who I find easy to binge because of the consistency in sound across her albums. But it&amp;rsquo;s also made me notice how different some of the songs are, like the light is coming from Sweetener (2018) which is so repetitive that I can&amp;rsquo;t actually listen to it, trap-pop banger 7 rings (thank u, next - 2019), or her trend of acapella/classical album openers like Intro (My Everything - 2014), raindrops (an angel cried) (Sweetener - 2018), and shut up (Positions - 2021).</description>
+    </item>
+    
+    <item>
+      <title>Building a colour classifier for Magic: The Gathering cards - Part 1: Data Exploration and Feature Engineering</title>
+      <link>https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/</link>
+      <pubDate>Sat, 20 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/posts/building-a-colour-classifier-for-magic-the-gathering-cards-part-1/</guid>
+      <description>Three lockdowns and a year of quarantine later, I&amp;rsquo;ve found myself with a few more hobbies and interests. Not quite a daily Yoga with Adriene habit (though I did manage about half a month before falling off that wagon) - but I have been playing a lot of Magic: The Gathering with friends.
+To those unacquainted, MTG was released in 1993 and is the world&amp;rsquo;s first trading card game - these days it also exists as an impressive and pandemic-friendly online interface.</description>
+    </item>
+    
+    <item>
+      <title>Analogue data visualisation (ft. Dear Data)</title>
+      <link>https://wanga02.github.io/posts/analogue-data-visualisation/</link>
+      <pubDate>Sun, 10 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://wanga02.github.io/posts/analogue-data-visualisation/</guid>
+      <description>In 2016 I went to the Big Bang Data exhibit at Somerset House and fell hard and fast for Giorgia Lupi and Stefanie Posavec&amp;rsquo;s art project. My good friend Maria (of Studio HOTmess) and I decided to take on the challenge. The idea is to record and visualise data around one aspect of your life each week, and then send it to your partner in crime in the post.
+We reprised the habit for a couple of months during the first 2020 lockdown.</description>
+    </item>
+    
+  </channel>
+</rss>
